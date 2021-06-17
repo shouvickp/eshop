@@ -125,11 +125,14 @@ const OrderScreen = ({ match, history }) => {
                 <strong>Method: </strong>
                 {order.paymentMethod}
               </p>
-              {order.isPaid ? (
+              {order.paymentMethod === 'COD' ?(
+                <Message variant='info'>pay at the time of delivary</Message>
+              ):(
+              order.isPaid ? (
                 <Message variant='success'>Paid on {order.paidAt}</Message>
               ) : (
                 <Message variant='danger'>Not Paid</Message>
-              )}
+              ))}
             </ListGroup.Item>
 
             <ListGroup.Item>
@@ -195,7 +198,7 @@ const OrderScreen = ({ match, history }) => {
                   <Col>${order.totalPrice}</Col>
                 </Row>
               </ListGroup.Item>
-              {!order.isPaid && (
+              {order.paymentMethod !== 'COD' && !order.isPaid && (
                 <ListGroup.Item>
                   {loadingPay && <Loader />}
                   {!sdkReady ? (
@@ -211,7 +214,7 @@ const OrderScreen = ({ match, history }) => {
               {loadingDeliver && <Loader />}
               {userInfo &&
                 userInfo.isAdmin &&
-                order.isPaid &&
+                (order.isPaid || order.paymentMethod == 'COD') &&
                 !order.isDelivered && (
                   <ListGroup.Item>
                     <Button
