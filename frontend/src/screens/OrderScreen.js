@@ -126,7 +126,11 @@ const OrderScreen = ({ match, history }) => {
                 {order.paymentMethod}
               </p>
               {order.paymentMethod === 'COD' ?(
-                <Message variant='info'>pay at the time of delivary</Message>
+                order.isPaid ? (
+                  <Message variant='success'>Paid on {order.paidAt}</Message>
+                ) : (
+                  <Message variant='info'>pay at the time of delivary</Message>
+                )
               ):(
               order.isPaid ? (
                 <Message variant='success'>Paid on {order.paidAt}</Message>
