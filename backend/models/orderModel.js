@@ -59,6 +59,16 @@ const orderSchema = mongoose.Schema(
     paidAt: {
       type: Date,
     },
+    isProcessingForDelivary:{
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    isOutForDelivary: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     isDelivered: {
       type: Boolean,
       required: true,

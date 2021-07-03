@@ -2,21 +2,23 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { PayPalButton } from 'react-paypal-button-v2'
 import { Link } from 'react-router-dom'
-import { Row, Col, ListGroup, Image, Card, Button } from 'react-bootstrap'
+import { Row, Col, ListGroup, Image, Card, Button,Form } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import {
   getOrderDetails,
   payOrder,
-  deliverOrder,
+  modifyOrderStatus,
 } from '../actions/orderActions'
 import {
   ORDER_PAY_RESET,
   ORDER_DELIVER_RESET,
 } from '../constants/orderConstants'
+import Progressbar from '../components/Progressbar'
 
 const OrderScreen = ({ match, history }) => {
+  const [orderStatus, setOrderStatus] = useState()
   const orderId = match.params.id
 
   const [sdkReady, setSdkReady] = useState(false)
@@ -81,8 +83,8 @@ const OrderScreen = ({ match, history }) => {
     dispatch(payOrder(orderId, paymentResult))
   }
 
-  const deliverHandler = () => {
-    dispatch(deliverOrder(order))
+  const ordStatusHanler = () => {
+    dispatch(modifyOrderStatus(order, orderStatus))
   }
 
   return loading ? (
@@ -110,15 +112,34 @@ const OrderScreen = ({ match, history }) => {
                 {order.shippingAddress.postalCode},{' '}
                 {order.shippingAddress.country}
               </p>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <h2>Order status</h2>
+              { 
+                !order.isProcessingForDelivary ? (
+                  <Progressbar percentage={15}>Your order is Confirmed</Progressbar>
+                ) : (
+                  !order.isOutForDelivary ? (
+                    <Progressbar percentage={45}>Your order is being processed for delivary</Progressbar>
+                  ) :
+                  (
+                    !order.isDelivered ? (
+                      <Progressbar percentage={75}>Your order is out for delivary</Progressbar>
+                    ) :(
+                    <Progressbar percentage={100}>Your order has been successfully delivered</Progressbar>
+                    )
+                  )
+                )
+              }
+
               {order.isDelivered ? (
                 <Message variant='success'>
                   Delivered on {order.deliveredAt}
                 </Message>
               ) : (
-                <Message variant='danger'>Not Delivered</Message>
+                <Message variant='warning'>Your order will be delevered within 7 days from {order.createdAt.substring(0, 10)}</Message>
               )}
             </ListGroup.Item>
-
             <ListGroup.Item>
               <h2>Payment Method</h2>
               <p>
@@ -173,10 +194,10 @@ const OrderScreen = ({ match, history }) => {
           </ListGroup>
         </Col>
         <Col md={4}>
-          <Card>
+          <Card border="info">
             <ListGroup variant='flush'>
               <ListGroup.Item>
-                <h2>Order Summary</h2>
+                <h2 className='text-info'>Order Summary</h2>
               </ListGroup.Item>
               <ListGroup.Item>
                 <Row>
@@ -221,13 +242,38 @@ const OrderScreen = ({ match, history }) => {
                 (order.isPaid || order.paymentMethod == 'COD') &&
                 !order.isDelivered && (
                   <ListGroup.Item>
-                    <Button
-                      type='button'
-                      className='btn btn-block'
-                      onClick={deliverHandler}
-                    >
-                      Mark As Delivered
-                    </Button>
+                  <Form>
+                    <Form.Group>
+                      <Form.Control 
+                        as="select" 
+                        className="my-3" 
+                        value={orderStatus}
+                        onChange={(e) => setOrderStatus(e.target.value)}
+                      >
+                        <option className="text-muted">Choose status of this order</option>
+                        <option 
+                          value="orderProcessing" 
+                          disabled={order.isProcessingForDelivary ? "disabled" : ""}
+                        > Mark as Processing</option>
+                        <option 
+                          value="outForDelivary"
+                          disabled={order.isOutForDelivary ? "disabled" : ""}
+                        > Mark as out for delivary</option>
+                        <option 
+                          value="deliver" 
+                          disabled={order.isDelivered ? "disabled" : ""}
+                        > Mark as Delivered</option>
+                      </Form.Control>
+                      <Button
+                        type='button'
+                        className='btn btn-block rounded'
+                        onClick={ordStatusHanler}
+                        variant="info"
+                      >
+                        Change Order Status
+                      </Button>
+                    </Form.Group>
+                    </Form>
                   </ListGroup.Item>
                 )}
             </ListGroup>

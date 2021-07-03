@@ -79,6 +79,46 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
   }
 })
 
+// @desc    Update order to processing
+// @route   GET /api/orders/:id/orderProcessing
+// @access  Private/Admin
+const updateOrderToProcessing = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id)
+
+  if (order) {
+
+    order.isProcessingForDelivary = true
+
+    const updatedOrder = await order.save()
+
+    res.json(updatedOrder)
+  } 
+  else {
+    res.status(404)
+    throw new Error('Order not found')
+  }
+})
+
+// @desc    Update order to outForDelivary
+// @route   GET /api/orders/:id/outForDelivary
+// @access  Private/Admin
+const updateOrderToOutForDelivery = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id)
+
+  if (order) {
+
+    order.isOutForDelivary = true
+
+    const updatedOrder = await order.save()
+
+    res.json(updatedOrder)
+  } 
+  else {
+    res.status(404)
+    throw new Error('Order not found')
+  }
+})
+
 // @desc    Update order to delivered
 // @route   GET /api/orders/:id/deliver
 // @access  Private/Admin
@@ -98,7 +138,8 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
     const updatedOrder = await order.save()
 
     res.json(updatedOrder)
-  } else {
+  } 
+  else {
     res.status(404)
     throw new Error('Order not found')
   }
@@ -124,6 +165,8 @@ export {
   addOrderItems,
   getOrderById,
   updateOrderToPaid,
+  updateOrderToProcessing,
+  updateOrderToOutForDelivery,
   updateOrderToDelivered,
   getMyOrders,
   getOrders,
