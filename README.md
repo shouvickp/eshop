@@ -1,8 +1,8 @@
-# ProShop eCommerce Platform
+# SUPAKART eCommerce Platform
 
 > eCommerce platform built with the MERN stack & Redux.
 
-![screenshot](https://github.com/bradtraversy/proshop_mern/blob/master/uploads/Screen%20Shot%202020-09-29%20at%205.50.52%20PM.png)
+![screenshot](https://github.com/shouvickp/eshop/blob/master/uploads/Screenshot%2021-07-04%at%02-58-25%supakart.png)
 
 ## Features
 
