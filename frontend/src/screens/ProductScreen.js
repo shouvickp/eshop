@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { Row, Col, Image, ListGroup, Card, Button, Form } from 'react-bootstrap'
+import { Row, Col, Image, ListGroup, Card, Button, Form, InputGroup } from 'react-bootstrap'
 import Rating from '../components/Rating'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
@@ -13,6 +13,7 @@ import {
 import { PRODUCT_CREATE_REVIEW_RESET } from '../constants/productConstants'
 
 const ProductScreen = ({ history, match }) => {
+  const [subscriberEmail,setSubscriberEmail]=useState('')
   const [qty, setQty] = useState(1)
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState('')
@@ -45,6 +46,10 @@ const ProductScreen = ({ history, match }) => {
 
   const addToCartHandler = () => {
     history.push(`/cart/${match.params.id}?qty=${qty}`)
+  }
+
+  const subscribeHandler = () => {
+    // return "Hello"
   }
 
   const submitHandler = (e) => {
@@ -213,6 +218,39 @@ const ProductScreen = ({ history, match }) => {
                   )}
                 </ListGroup.Item>
               </ListGroup>
+            </Col>
+            <Col md={6}>
+              <h5> Subscribe the product now</h5>
+              { product.countInStock === 0 && (
+                    <Form className="row px-2">
+                      <Col md={8} className="px-0">
+                        <InputGroup className="mb-3">
+                          <InputGroup.Prepend>
+                            <InputGroup.Text id="email-subscriber"><i className="fa fa-envelope" /></InputGroup.Text>
+                          </InputGroup.Prepend>
+                          <Form.Control
+                            value={subscriberEmail}
+                            onChange={(e) => setSubscriberEmail(e.target.value)}
+                            type="email"
+                            placeholder="Your Email"
+                            aria-label="email-subscriber"
+                            aria-describedby="email-subscriber"
+                          />
+                        </InputGroup>
+                      </Col>
+                      <Col md={4} className="p-0">
+                        <Button
+                          onClick={subscribeHandler}
+                          className='btn-block btn-warning'
+                          type='button'
+                        >
+                          Subscribe
+                        </Button>
+                    </Col>
+                    </Form>
+                )
+              }
+              <span className="text-muted font-italic">Subscribe to get notified when the product will be back in stock</span>
             </Col>
           </Row>
         </>

@@ -1,5 +1,9 @@
 import asyncHandler from 'express-async-handler'
 import Order from '../models/orderModel.js'
+import User from '../models/userModel.js'
+import nodemailer from 'nodemailer'
+import Product from '../models/productModel.js'
+
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -19,7 +23,18 @@ const addOrderItems = asyncHandler(async (req, res) => {
     res.status(400)
     throw new Error('No order items')
     return
-  } else {
+  } 
+  else {
+    for (let item of orderItems) {
+        let ordProduct = await Product.findById(item.product)
+        if (ordProduct) {
+          ordProduct.countInStock = ordProduct.countInStock - item.qty
+          let updatedProduct = await ordProduct.save()
+          if(updatedProduct){
+            console.log(updatedProduct)
+          }
+        }
+    }
     const order = new Order({
       orderItems,
       user: req.user._id,
@@ -30,9 +45,44 @@ const addOrderItems = asyncHandler(async (req, res) => {
       shippingPrice,
       totalPrice,
     })
-
     const createdOrder = await order.save()
-
+    if(createdOrder){
+      const user = await User.findById(createdOrder.user)
+      async function main() {
+          // create reusable transporter object using the default SMTP transport
+          let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.MAILER_USER, // generated ethereal user
+                pass: process.env.MAILER_PASS, // generated ethereal password
+            },
+          });
+              
+          // send mail with defined transport object
+          let info = await transporter.sendMail({
+            from: '🛒"supakart" <pshouvickd97@gmail.com>', // sender address
+            to: `${user.email}`, // list of receivers
+            subject: "Order Confirmed", // Subject line
+            html: `<h5>Hi ${user.name} Your order has been Confirmed</h5>
+            <h3>Order ID : ${createdOrder._Id}</h4>
+            <hr/>
+            <h5>Item Details</h5>
+            <table>
+              <tr><th>Item name</th><th>Quantity x Price</th><th>Subtotal</th></tr>
+            </table>
+            <hr/>
+            <h5>your order will be delivered within  ${createdOrder.createdAt}<h5>`, // html body
+          });
+          if(info.messageId){
+            console.log("Message sent: %s", info.messageId);
+          }
+          // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+          else{
+            console.log("Message Jaini:");
+          }
+        }  
+      main().catch(console.error);
+    }
     res.status(201).json(createdOrder)
   }
 })
