@@ -3,7 +3,7 @@
 > eCommerce platform built with the MERN stack & Redux.
 
 ![screenshot](https://github.com/shouvickp/eshop/blob/0dd34cfc66a6d7b229524fea94d9a7c9640fb84c/uploads/Screenshot%202021-07-04%20at%2002-58-25%20supakart.png)
-
+![Alt text](/uploads/Screenshot 2021-07-04 at 02-58-25 supakart.png?raw=true "Optional Title")
 ## Features
 
 - Full featured shopping cart
